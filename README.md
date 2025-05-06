@@ -1,2 +1,2 @@
 # my-conf
-my personal config
+here are my personal config
