@@ -6,16 +6,15 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-# Path to your oh-my-zsh installation.
+# Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
+# load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-#ZSH_THEME="robbyrussell"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
@@ -82,7 +81,8 @@ plugins=(
     git
     zsh-autosuggestions
     zsh-syntax-highlighting
-    #fast-syntax-highlighting
+    thefuck
+    kubectl
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -98,43 +98,46 @@ source $ZSH/oh-my-zsh.sh
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='mvim'
+#   export EDITOR='nvim'
 # fi
 
 # Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch $(uname -m)"
 
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+
+# modify values bellow ONLY  ------------------------------------------
+
+
 # http proxy function
 export HTTP_PROXY_ADDR="http://127.0.0.1:7890"
-export NIO_PROXY_ADDR="http://proxy.nioint.com:8080"
 
 proxy() {
     if [[ $1 == "on" ]]; then
         export http_proxy=$HTTP_PROXY_ADDR
         export https_proxy=$HTTP_PROXY_ADDR
         echo "HTTP proxy is turned on"
-    elif [[ $1 == "nio" ]]; then
-        export http_proxy=$NIO_PROXY_ADDR
-        export https_proxy=$NIO_PROXY_ADDR
-        echo "NIO proxy is turned on"
     elif [[ $1 == "off" ]]; then
         unset http_proxy
         unset https_proxy
         echo "HTTP proxy is turned off"
     else
-        echo "Invalid argument. Usage: proxy on/off/nio"
+        echo "Invalid argument. Usage: proxy on/off"
     fi
 }
 
@@ -143,56 +146,58 @@ proxy() {
 #export https_proxy=$HTTP_PROXY_ADDR
 
 # SYSTEM PATH
-export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
+export PATH="$HOME/Library/Application Support/JetBrains/Toolbox/scripts:$PATH"
 
 # GO ENV
-#export GOROOT="/Users/xinmeng.wang/.go"
-export GOPATH="/Users/xinmeng.wang/go"
-export GOPROXY="https://goproxy.cn,direct"
+export GOPATH="$HOME/go"
+export GOPROXY="https://goproxy.byted.org|https://goproxy.cn|direct"
 export GO111MODULE=on
-export GOPRIVATE=*.nevint.com,*.nioint.com
-export GONOPROXY=*.nevint.com,*.nioint.com
-export GONOSUMDB=*.nevint.com,*.nioint.com
+export GOPRIVATE="*.byted.org,*.everphoto.cn,git.smartisan.com"
+#export GONOPROXY="*.byted.org,*.everphoto.cn,git.smartisan.com"
+export GONOSUMDB="sum.golang.google.cn"
 export PATH=$PATH:$GOPATH/bin
 
 # alias
 
-# remove git alias
-unalias g
 alias k='kubectl'
 alias kns='kubens'
 alias kctx='kubectx'
 #alias docker='nerdctl'
-alias fk="fuck"
 alias pip=pip3
 alias cpp="rsync -av --progress"
+
+
 # add some shortcut
 
 
 # k8s
-export KUBECONFIG="${KUBECONFIG}:$HOME/.kube/config:$(find $HOME/.kube/configs -type f -maxdepth 1 | tr '\n' ':')"
-# add k3d
-export KUBECONFIG="$KUBECONFIG:$HOME/.k3d/kubeconfig-k3s-default.yaml"
+#export KUBECONFIG="${KUBECONFIG}:$HOME/.kube/config:$(find $HOME/.kube/configs -type f -maxdepth 1 | tr '\n' ':')"
 
 # add java
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
-export PATH=$JAVA_HOME:$PATH
+#export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
+#export PATH=$JAVA_HOME:$PATH
+
 # eval
 eval $(thefuck --alias)
 eval "$(jump shell)"
 
 # config g
 # g shell setup
+# remove git alias
+unalias g
 if [ -f "${HOME}/.g/env" ]; then
     . "${HOME}/.g/env"
 fi
 # set g env
 export G_MIRROR=https://golang.google.cn/dl/
 
+export GIT_WORK_USER="xinmengwang"
+export GIT_WORK_MAIL="xinmengwang@bytedance.com"
+
 git_switch_user () {
-  if [[ $1 == "nio" ]]; then
-    git config user.name xinmeng.wang
-    git config user.email xinmeng.wang@nio.com
+  if [[ $1 == "work" ]]; then
+    git config user.name $GIT_WORK_USER
+    git config user.email $GIT_WORK_MAIL
     echo "git user switch to $1"
   elif [[ $1 == "gh" ]]; then
     git config user.name kiritoxkiriko
@@ -202,3 +207,4 @@ git_switch_user () {
     echo "wrong name"
   fi
 }
+
