@@ -154,7 +154,7 @@ export GOPROXY="https://goproxy.byted.org|https://goproxy.cn|direct"
 export GO111MODULE=on
 export GOPRIVATE="*.byted.org,*.everphoto.cn,git.smartisan.com"
 #export GONOPROXY="*.byted.org,*.everphoto.cn,git.smartisan.com"
-export GONOSUMDB="sum.golang.google.cn"
+export GOSUMDB="sum.golang.google.cn"
 export PATH=$PATH:$GOPATH/bin
 
 # alias
