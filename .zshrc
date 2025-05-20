@@ -81,8 +81,10 @@ plugins=(
     git
     zsh-autosuggestions
     zsh-syntax-highlighting
+    #zsh-autocomplete
     thefuck
     kubectl
+    poetry
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -146,7 +148,9 @@ proxy() {
 #export https_proxy=$HTTP_PROXY_ADDR
 
 # SYSTEM PATH
+export PATH="$(brew --prefix rustup)/bin:$PATH"
 export PATH="$HOME/Library/Application Support/JetBrains/Toolbox/scripts:$PATH"
+export PATH="$PATH:/Users/bytedance/.local/bin"
 
 # GO ENV
 export GOPATH="$HOME/go"
@@ -158,10 +162,11 @@ export GOSUMDB="sum.golang.google.cn"
 export PATH=$PATH:$GOPATH/bin
 
 # alias
-
 alias k='kubectl'
 alias kns='kubens'
 alias kctx='kubectx'
+alias kv='kubevpn'
+alias kva='kubevpn alias'
 #alias docker='nerdctl'
 alias pip=pip3
 alias cpp="rsync -av --progress"
@@ -171,7 +176,7 @@ alias cpp="rsync -av --progress"
 
 
 # k8s
-#export KUBECONFIG="${KUBECONFIG}:$HOME/.kube/config:$(find $HOME/.kube/configs -type f -maxdepth 1 | tr '\n' ':')"
+export KUBECONFIG="${KUBECONFIG}:$HOME/.kube/config:$(find $HOME/.kube/configs -type f -maxdepth 1 | tr '\n' ':')"
 
 # add java
 #export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
@@ -198,13 +203,25 @@ git_switch_user () {
   if [[ $1 == "work" ]]; then
     git config user.name $GIT_WORK_USER
     git config user.email $GIT_WORK_MAIL
+    git config commit.gpgsign true
     echo "git user switch to $1"
   elif [[ $1 == "gh" ]]; then
     git config user.name kiritoxkiriko
     git config user.email wangxinmeng1997@hotmail.com
+    git config commit.gpgsign false
     echo "git user switch to $1"
   else
     echo "wrong name"
   fi
 }
+
+devbox () {
+  kinit --keychain xinmengwang@BYTEDANCE.COM
+  if [[ $1 == "gpu" ]]; then
+    ssh dev-gpu
+  else
+    ssh dev-cpu
+  fi
+}
+
 
