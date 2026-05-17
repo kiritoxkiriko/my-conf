@@ -12,6 +12,7 @@ Personal macOS development configuration templates.
 - `config.ghostty`: Ghostty terminal template.
 - `init.sh`: Homebrew bootstrap script for common CLI, shell, Kubernetes, and
   development tools.
+- `AGENTS.md`: Agent-readable installation guide and safety rules.
 - `raycast.template.md`: Non-sensitive Raycast settings template.
 - `raycast_cong.rayconfig`: Raycast export backup. Review before sharing or
   replacing it because Raycast exports may include private workflow metadata.
