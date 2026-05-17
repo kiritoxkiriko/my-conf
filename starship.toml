@@ -1,0 +1,101 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$cmd_duration\
+$line_break\
+$python\
+$conda\
+$nodejs\
+$golang\
+$rust\
+$docker_context\
+$kubernetes\
+$container\
+$character"""
+
+[directory]
+style = "blue"
+
+[character]
+success_symbol = "[❯](purple)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](green)"
+
+[git_branch]
+format = "[$branch]($style)"
+style = "bright-black"
+
+[git_status]
+format = "[ ($ahead_behind$stashed)]($style)"
+style = "cyan"
+conflicted = ""
+untracked = ""
+modified = ""
+staged = ""
+renamed = ""
+deleted = ""
+stashed = "≡"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bright-black"
+
+[cmd_duration]
+format = "[$duration]($style) "
+style = "yellow"
+
+[python]
+symbol = " "
+format = "[$symbol$virtualenv]($style) "
+style = "bright-black"
+detect_extensions = []
+detect_files = []
+
+[conda]
+symbol = "󱔎 "
+format = "[$symbol$environment]($style) "
+style = "bright-black"
+ignore_base = true
+
+[nodejs]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bright-black"
+detect_extensions = ["js", "mjs", "cjs", "ts", "mts", "cts", "tsx"]
+detect_files = ["package.json", ".node-version", ".nvmrc"]
+detect_folders = []
+
+[golang]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bright-black"
+
+[rust]
+symbol = " "
+format = "[$symbol$version]($style) "
+style = "bright-black"
+
+[docker_context]
+symbol = " "
+format = "[$symbol$context]($style) "
+style = "bright-black"
+only_with_files = true
+
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+format = "[$symbol$context( $namespace)]($style) "
+style = "bright-black"
+detect_files = ["kustomization.yaml", "Chart.yaml", "skaffold.yaml"]
+detect_folders = ["k8s", "kubernetes", "manifests", "charts"]
+
+[container]
+symbol = "⬢ "
+format = "[$symbol$name]($style) "
+style = "bright-black"

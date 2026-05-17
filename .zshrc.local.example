@@ -1,0 +1,22 @@
+# Copy this file to ~/.zshrc.local and fill in values that should not be
+# committed to the repository.
+
+# Optional local proxy address.
+# export HTTP_PROXY_ADDR="http://127.0.0.1:7890"
+
+# Optional private Go module configuration.
+# export GOPRIVATE="*.example.internal"
+# export GONOPROXY="*.example.internal"
+
+# Git identities.
+# export GIT_WORK_USER="your-work-name"
+# export GIT_WORK_MAIL="you@example.com"
+# export GIT_WORK_GPGSIGN="false"
+# export GIT_GH_USER="your-github-name"
+# export GIT_GH_MAIL="you@example.com"
+# export GIT_GH_GPGSIGN="false"
+
+# Remote development hosts.
+# export DEVBOX_KRB_PRINCIPAL="you@EXAMPLE.COM"
+# export DEVBOX_CPU_HOST="your-cpu-host"
+# export DEVBOX_GPU_HOST="your-gpu-host"

@@ -1,10 +1,3 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -15,7 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME=""
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -81,10 +74,6 @@ plugins=(
     git
     zsh-autosuggestions
     zsh-syntax-highlighting
-    #zsh-autocomplete
-    thefuck
-    kubectl
-    poetry
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -118,16 +107,21 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-
 # modify values bellow ONLY  ------------------------------------------
 
+# Prompt
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
 
-# http proxy function
-export HTTP_PROXY_ADDR="http://127.0.0.1:7890"
+# Local private overrides. Keep accounts, internal domains, hosts, and secrets
+# in this file instead of committing them to the repository.
+if [[ -f "$HOME/.zshrc.local" ]]; then
+    source "$HOME/.zshrc.local"
+fi
+
+# HTTP proxy helper
+export HTTP_PROXY_ADDR="${HTTP_PROXY_ADDR:-http://127.0.0.1:7890}"
 
 proxy() {
     if [[ $1 == "on" ]]; then
@@ -143,85 +137,100 @@ proxy() {
     fi
 }
 
-## keep proxy on
-#export http_proxy=$HTTP_PROXY_ADDR
-#export https_proxy=$HTTP_PROXY_ADDR
+# System PATH
+if command -v brew >/dev/null 2>&1 && brew --prefix rustup >/dev/null 2>&1; then
+    export PATH="$(brew --prefix rustup)/bin:$PATH"
+fi
 
-# SYSTEM PATH
-export PATH="$(brew --prefix rustup)/bin:$PATH"
 export PATH="$HOME/Library/Application Support/JetBrains/Toolbox/scripts:$PATH"
-export PATH="$PATH:/Users/bytedance/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
 
-# GO ENV
-export GOPATH="$HOME/go"
-export GOPROXY="https://goproxy.byted.org|https://goproxy.cn|direct"
+# Go environment
+export GOPATH="${GOPATH:-$HOME/go}"
+export GOPROXY="${GOPROXY:-https://goproxy.cn|direct}"
 export GO111MODULE=on
-export GOPRIVATE="*.byted.org,*.everphoto.cn,git.smartisan.com"
-#export GONOPROXY="*.byted.org,*.everphoto.cn,git.smartisan.com"
-export GOSUMDB="sum.golang.google.cn"
-export PATH=$PATH:$GOPATH/bin
+export GOSUMDB="${GOSUMDB:-sum.golang.google.cn}"
+export PATH="$PATH:$GOPATH/bin"
 
-# alias
+# Set private Go module patterns in ~/.zshrc.local when needed.
+# Example:
+# export GOPRIVATE="*.example.internal"
+# export GONOPROXY="*.example.internal"
+
+# Aliases
 alias k='kubectl'
 alias kns='kubens'
 alias kctx='kubectx'
 alias kv='kubevpn'
 alias kva='kubevpn alias'
-#alias docker='nerdctl'
-alias pip=pip3
-alias cpp="rsync -av --progress"
+alias pip='pip3'
+alias cpp='rsync -av --progress'
 
-
-# add some shortcut
-
-
-# k8s
-export KUBECONFIG="${KUBECONFIG}:$HOME/.kube/config:$(find $HOME/.kube/configs -type f -maxdepth 1 | tr '\n' ':')"
-
-# add java
-#export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home
-#export PATH=$JAVA_HOME:$PATH
-
-# eval
-eval $(thefuck --alias)
-eval "$(jump shell)"
-
-# config g
-# g shell setup
-# remove git alias
-unalias g
-if [ -f "${HOME}/.g/env" ]; then
-    . "${HOME}/.g/env"
+# Kubernetes config aggregation
+if [[ -d "$HOME/.kube/configs" ]]; then
+    export KUBECONFIG="${KUBECONFIG}:$HOME/.kube/config:$(find "$HOME/.kube/configs" -maxdepth 1 -type f | tr '\n' ':')"
+else
+    export KUBECONFIG="${KUBECONFIG}:$HOME/.kube/config"
 fi
-# set g env
-export G_MIRROR=https://golang.google.cn/dl/
 
-export GIT_WORK_USER="xinmengwang"
-export GIT_WORK_MAIL="xinmengwang@bytedance.com"
+# Optional command integrations
+if command -v thefuck >/dev/null 2>&1; then
+    eval "$(thefuck --alias)"
+fi
 
-git_switch_user () {
-  if [[ $1 == "work" ]]; then
-    git config user.name $GIT_WORK_USER
-    git config user.email $GIT_WORK_MAIL
-    git config commit.gpgsign true
-    echo "git user switch to $1"
-  elif [[ $1 == "gh" ]]; then
-    git config user.name kiritoxkiriko
-    git config user.email wangxinmeng1997@hotmail.com
-    git config commit.gpgsign false
-    echo "git user switch to $1"
-  else
-    echo "wrong name"
-  fi
+if command -v jump >/dev/null 2>&1; then
+    eval "$(jump shell)"
+fi
+
+# g shell setup
+unalias g 2>/dev/null || true
+if [[ -f "$HOME/.g/env" ]]; then
+    source "$HOME/.g/env"
+fi
+export G_MIRROR="${G_MIRROR:-https://golang.google.cn/dl/}"
+
+git_switch_user() {
+    if [[ $1 == "work" ]]; then
+        if [[ -z "$GIT_WORK_USER" || -z "$GIT_WORK_MAIL" ]]; then
+            echo "Set GIT_WORK_USER and GIT_WORK_MAIL in ~/.zshrc.local"
+            return 1
+        fi
+        git config user.name "$GIT_WORK_USER"
+        git config user.email "$GIT_WORK_MAIL"
+        git config commit.gpgsign "${GIT_WORK_GPGSIGN:-false}"
+        echo "git user switch to $1"
+    elif [[ $1 == "gh" ]]; then
+        if [[ -z "$GIT_GH_USER" || -z "$GIT_GH_MAIL" ]]; then
+            echo "Set GIT_GH_USER and GIT_GH_MAIL in ~/.zshrc.local"
+            return 1
+        fi
+        git config user.name "$GIT_GH_USER"
+        git config user.email "$GIT_GH_MAIL"
+        git config commit.gpgsign "${GIT_GH_GPGSIGN:-false}"
+        echo "git user switch to $1"
+    else
+        echo "Invalid argument. Usage: git_switch_user work/gh"
+        return 1
+    fi
 }
 
-devbox () {
-  kinit --keychain xinmengwang@BYTEDANCE.COM
-  if [[ $1 == "gpu" ]]; then
-    ssh dev-gpu
-  else
-    ssh dev-cpu
-  fi
+devbox() {
+    local target_host
+
+    if [[ $1 == "gpu" ]]; then
+        target_host="$DEVBOX_GPU_HOST"
+    else
+        target_host="$DEVBOX_CPU_HOST"
+    fi
+
+    if [[ -z "$target_host" ]]; then
+        echo "Set DEVBOX_CPU_HOST or DEVBOX_GPU_HOST in ~/.zshrc.local"
+        return 1
+    fi
+
+    if [[ -n "$DEVBOX_KRB_PRINCIPAL" ]]; then
+        kinit --keychain "$DEVBOX_KRB_PRINCIPAL"
+    fi
+
+    ssh "$target_host"
 }
-
-
